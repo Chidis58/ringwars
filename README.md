@@ -8,8 +8,8 @@ An experimental social game exploring competitive relationship dynamics using to
 
 RingWars is a **network-driven social interaction game** where:
 
-- Boys (G) compete for influence and status
-- Girls (H) manage attention, exclusivity, and value
+- Boys (B) compete for influence and status
+- Girls (G) manage attention, exclusivity, and value
 - Social overlap increases cost and tension
 - Ownership is temporary, contested, and emotional
 
@@ -20,7 +20,7 @@ It is a **competitive attention economy with strategy, ego, and chaos**.
 
 ## 🎮 Core Entities
 
-### 👦 Boy (G)
+### 👦 Boy (B)
 - Has: 🪙 (tokens)
 - Goal:
   - Acquire 💍 (ring status)
@@ -29,7 +29,7 @@ It is a **competitive attention economy with strategy, ego, and chaos**.
 
 ---
 
-### 👧 Girl (H)
+### 👧 Girl (G)
 - Has: ⤵️ (Visit Load / Social Pressure)
 - Goal:
   - Earn 🪙
