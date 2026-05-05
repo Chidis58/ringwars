@@ -1,1 +1,8 @@
+# Core (optional but recommended)
+numpy>=1.24.0
 
+# Visualization (optional, for later graphs)
+matplotlib>=3.7.0
+
+# Graph simulation (future use)
+networkx>=3.0
