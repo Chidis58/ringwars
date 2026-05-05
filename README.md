@@ -1,252 +1,229 @@
 # 💍 RingWars
 
-An experimental social game exploring competitive relationship dynamics using tokens, social graphs, and psychological pressure.
+> A competitive social graph game where status is temporary, strategy is everything, and the economy is alive.
 
 ---
 
-## 🧠 Concept
+## What is this?
 
-RingWars is a **network-driven social interaction game** where:
+RingWars is an **experimental network game** built on a simple premise:
 
-- Boys (B) compete for influence and status
-- Girls (G) manage attention, exclusivity, and value
-- Social overlap increases cost and tension
-- Ownership is temporary, contested, and emotional
+In real social life, attention is scarce, competition is real, and influence has a price. Most apps pretend otherwise. RingWars doesn't.
 
-This is **not a traditional dating app**.  
-It is a **competitive attention economy with strategy, ego, and chaos**.
+It models a social graph as a **live competitive economy** — where players spend resources to build connections, defend status, and outmaneuver each other across overlapping social networks. The mechanics are inspired by how status and attention actually work: as contested, dynamic, and driven by social context rather than individual merit alone.
 
----
-
-## 🎮 Core Entities
-
-### 👦 Boy (B)
-- Has: 🪙 (tokens)
-- Goal:
-  - Acquire 💍 (ring status)
-  - Build unique, non-overlapping connections
-  - Outcompete other boys efficiently
+This is **not a dating app.**
+It is a **strategy game about social dynamics** — with real stakes, real pressure, and emergent behavior you can't fully predict.
 
 ---
 
-### 👧 Girl (G)
-- Has: ⤵️ (Visit Load / Social Pressure)
-- Goal:
-  - Earn 🪙
-  - Maintain low ⤵️ (avoid saturation)
-  - Attract high-value competition
+## Core Concepts
+
+### The Two Roles
+
+**Connectors** (🔵) are resource managers.
+- Hold a token budget (🪙)
+- Spend tokens to build and defend connections
+- Must navigate social graphs efficiently — overlapping with other Connectors is expensive
+- Goal: build high-conviction, defensible connections without depleting capital
+
+**Nodes** (🔴) are attention economists.
+- Hold a social pressure score (⤵️)
+- Earn tokens by attracting competitive bidding
+- Must manage saturation — too much cluster overlap degrades their position
+- Goal: maintain healthy diversity, maximize earned value, control who competes for them
+
+Both roles have meaningful agency. Neither is passive.
 
 ---
 
-## 💰 Core Variables
+### The Economy
 
-### 🪙 Tokens
-- Currency used by boys
-- Spent to:
-  - Connect
-  - Compete
-  - Defend 💍
-- Limited → forces strategic decisions
+#### 🪙 Tokens
+The base currency. Spent by Connectors to initiate connections, compete for Ring status, and defend existing positions. Limited supply forces prioritization.
 
----
+#### ⤵️ Visit Load (Social Pressure)
+Tracks how saturated a Node is with socially-clustered connections.
 
-### ⤵️ Visit Load (Social Saturation)
-Represents how overwhelmed or socially clustered a girl is.
-
-- Increases when:
-  - Boys from the same social circle connect to her
-
-- Decreases when:
-  - She connects to diverse, unrelated boys
-  - She avoids over-engagement
-
-**Effects:**
-- High ⤵️ → higher future costs
-- Very high ⤵️ → reduced attractiveness or temporary lock
-
----
-
-### 💠 Conviction Score
-Represents how strongly a boy has invested in a girl.
-
-- Increases from:
-  - 🪙 spent
-  - repeated interactions
-
-- Decays slowly over time
-
-**Purpose:**
-- Tracks long-term commitment
-- Prevents “last move wins” instability
-
----
-
-### 💍 Ring (Champion Status)
-Represents the **current dominant holder** of a girl.
-
-- Awarded to:
-  > The last boy who successfully outbids the current threshold
-
-- Temporary and highly contestable
-
----
-
-## ⚙️ Core Mechanics
-
-### 🔗 Connecting to a Girl
-
-Cost depends on social overlap:
-cost = Base x ( 1 Cluster Pressure)
-- Low overlap → cheap, efficient
-- High overlap → expensive, competitive
-
----
-
-### 🔥 Cluster Pressure
-
-Triggered when:
-- A boy tries to connect to a girl already connected to his mutual friends
+- **Increases** when Connectors from the same social cluster connect to the same Node
+- **Decreases** when the Node maintains diverse, non-overlapping connections
 
 Effects:
-- 🪙 Cost increases
-- ⤵️ increases (bad for girl)
+- High ⤵️ → future connection costs increase for everyone
+- Maximum ⤵️ → temporary lock state (the Node is unreachable until pressure decays)
+
+This mechanic rewards diversity and punishes herd behavior.
+
+#### 💠 Conviction Score
+Tracks long-term investment between a Connector and a Node.
+
+- Grows with repeated spending and interactions
+- Decays slowly over time
+- Prevents "last bid wins" instability — a deeply invested Connector holds structural advantages
+
+#### 💍 Ring Status
+The current dominant Connector for a given Node — publicly visible, actively contested.
+
+Awarded to the last Connector who successfully outbids the current threshold. Temporary by design.
 
 ---
 
-### 💍 Buyback / Bidding System
+## Core Mechanics
 
-Each time 💍 changes hands:
-Next Cost = Previous Cost x ( 1 + overlap + streak)
-- Overlap = social graph similarity
-- Streak = recent competition intensity
+### Connection Cost
 
-**Result:**
-- Escalating bidding wars
-- Emotional decision-making
-- Rapid cost inflation
+```
+cost = base_cost × (1 + cluster_pressure)
+```
 
----
+Cluster pressure activates when a Connector tries to reach a Node already connected to their mutual peers. Low social overlap = cheap. High overlap = expensive. This punishes blind herding and rewards graph exploration.
 
-### 💠 vs 💍 Dynamic
+### Bidding & Escalation
 
-- 💍 = current winner (short-term)
-- 💠 = true investment (long-term)
+When 💍 changes hands:
 
-A boy can:
-- Win 💍 quickly with high spending
-- Lose later to someone with stronger 💠
+```
+next_cost = previous_cost × (1 + overlap_factor + streak_factor)
+```
 
----
+- **overlap_factor**: how socially similar the competing Connectors are
+- **streak_factor**: how recently and intensely this Node has been contested
 
-## 👧 Girl Strategy Layer
+This produces escalating bidding wars with natural inflation. Costs rise until someone blinks, runs out of tokens, or finds a smarter play elsewhere.
 
-Girls balance:
+> **Balance note:** Escalation is soft-capped to prevent runaway inflation locking the economy. Cost growth cannot exceed a percentage of the current average token balance in the active cluster.
 
-| Choice | Outcome |
-|------|--------|
-| Accept diverse boys | ⤵️ decreases (healthy) |
-| Accept clustered boys | ⤵️ increases (risky) |
-| Encourage bidding | more 🪙, more chaos |
+### 💍 vs 💠 — Short-term vs Long-term
 
----
+A Connector with a high 💠 score has *structural* advantages even without holding 💍:
 
-### 🎭 Influence Mechanic
+- Lower effective bidding costs
+- Faster Conviction recovery after losing Ring status
+- Resistance to being fully displaced by a high-spend newcomer
 
-Girls can influence boys by:
-- Encouraging competition
-- Creating urgency
-- Reducing perceived cost
-Effective Cost = Cost x (1 - InfluenceFactor)
----
+This means brute-force spending is not a guaranteed winning strategy. Patience and consistency compete with aggression.
 
-## 👦 Boy Strategy Layer
+### Node Influence
 
-Boys must choose between:
+Nodes aren't just passive targets. They can actively shape competition:
 
-- **Exploration**
-  - Find new girls (low cost, low competition)
+```
+effective_cost = cost × (1 - influence_factor)
+```
 
-- **Competition**
-  - Fight for existing girls (high cost, high status)
+A Node can reduce perceived cost to invite more competition, encourage specific Connectors, or signal disinterest to cool a bidding war. This is the core of the Node strategy layer.
 
 ---
 
-## 🌍 Public vs Private Layers
+## Information Visibility
 
-### 🔒 Private Layer (Core Game)
-- All real mechanics happen here
-- 💍, 💠, 🪙, ⤵️ are calculated here
+Who knows what is a core design variable — not a UX detail.
 
----
+| Variable | Connector sees | Node sees |
+|---|---|---|
+| Own 🪙 balance | ✅ | — |
+| Other Connectors' 🪙 | ❌ (estimated via behavior) | ❌ |
+| Own ⤵️ | — | ✅ |
+| Current 💍 holder | ✅ | ✅ |
+| 💠 scores | Own only | Aggregate signal |
+| Cluster pressure | Partial (own connections) | Full (all inbound) |
 
-### 🌐 Public Layer (Optional Feature)
-
-Triggered by posts:
-- Appeals
-- Flirting
-- Social proof
-- Drama
-
-Public engagement creates:
-
-### 📈 Hype Score
-- Increases 💠 gain rate
-- Encourages 💍 challenges
-- Reduces perceived cost temporarily
-
-**Role:**
-> Public = psychological pressure layer, not core logic
+Asymmetric information is intentional. Strategy emerges from uncertainty.
 
 ---
 
-## 🔁 Emergent Dynamics
+## Strategy Layers
 
-- Bidding wars between boys
-- Strategic girls controlling attention flow
-- Social graph-based pricing
-- Resource depletion and risky plays
-- High-value vs over-saturated players
+### Connector Strategies
 
----
+| Approach | Trade-off |
+|---|---|
+| **Exploration** — target low-pressure Nodes with no competition | Low cost, low status, high 💠 potential |
+| **Competition** — contest high-value Nodes in active clusters | High cost, high status, rapid token burn |
+| **Conviction building** — deep investment in one Node over time | Slow, defensible, hard to displace |
+| **Disruption** — spike into an active bidding war to drain rivals | Aggressive, zero-sum, expensive |
 
-## 🎯 Design Philosophy
+### Node Strategies
 
-This system is designed to be:
-
-- Competitive
-- Emotional
-- Unstable (in a controlled way)
-- Socially reactive
-
-It intentionally introduces:
-- Ego
-- Scarcity
-- Pressure
-- Strategy
+| Approach | Trade-off |
+|---|---|
+| **Diversity** — accept varied, non-overlapping Connectors | Low ⤵️, healthy economy, lower peak earnings |
+| **Auction mode** — encourage cluster competition | High token earnings, rapid ⤵️ buildup, saturation risk |
+| **Selective exclusivity** — signal high cost to filter low-conviction bids | Slower competition, higher quality signals |
 
 ---
 
-## 🚧 Future Ideas
+## Public Layer
 
-- Time-based decay systems
-- AI-driven influence behavior
-- Reputation scoring
-- Group dynamics (girl clusters affecting each other)
-- Visualization of social graphs
+Beyond the private economy, players can interact publicly through posts, signals, and social proof.
 
----
+Public activity generates a **Hype Score** that:
+- Temporarily reduces perceived connection cost (invites new competition)
+- Increases 💠 gain rate for active participants
+- Triggers 💍 challenges from previously passive Connectors
 
-## ⚠️ Note
-
-This is an experimental system exploring social dynamics.  
-Balance, fairness, and ethical considerations will need refinement as the system evolves.
+The public layer is **psychological pressure**, not core mechanics. It doesn't override the economy — it amplifies it.
 
 ---
 
-## 🚀 Goal
+## Emergent Behavior
 
-To create a **non-traditional social interaction system** that is:
-- Engaging
-- Strategic
-- Dramatic
-- Worth talking about
+The system is designed to produce dynamics that aren't scripted:
+
+- Bidding wars that drain competing Connectors simultaneously
+- Nodes engineering their own scarcity
+- Social clusters forming and collapsing based on graph topology
+- Token economies going inflationary in dense clusters and deflationary in sparse ones
+- Long-conviction Connectors outlasting high-spend newcomers
+
+This is the goal. The game is interesting when outcomes surprise everyone, including the designer.
+
+---
+
+## Design Philosophy
+
+RingWars is built on three beliefs:
+
+1. **Honesty over comfort.** Social competition exists. Making it visible and playable is more interesting than pretending it doesn't happen.
+
+2. **Asymmetry is depth.** The two roles are not mirrors of each other. They have different goals, different resources, and different win conditions. That asymmetry is where strategy lives.
+
+3. **Economy first.** Every mechanic must feed back into the token/pressure economy. Features that don't affect the economy don't belong in the core game.
+
+---
+
+## Current Status
+
+RingWars is in **design and simulation phase.**
+
+Active work:
+- [ ] Economy simulation (Python / NetworkX) — testing inflation curves, token depletion, cluster dynamics
+- [ ] Formula tuning — soft caps, regeneration rates, conviction decay
+- [ ] Win condition design — what does "winning" feel like for each role?
+- [ ] Minimum viable lobby — what graph density makes the mechanics come alive?
+
+---
+
+## Roadmap
+
+- **v0.1** — Headless simulation: validate economy balance across 500+ cycles
+- **v0.2** — CLI prototype: human-playable with text state output
+- **v0.3** — Graph visualization: live social graph view, pressure heatmaps, ring ownership history
+- **v0.4** — Public layer: posts, hype score, social proof mechanics
+- **v1.0** — Full client: multiplayer, real social graph import, AI-populated lobbies for low-density onboarding
+
+---
+
+## Contributing / Feedback
+
+This is an experimental project. The design is not finished. If you have thoughts on:
+- Economy balance
+- Role asymmetry
+- Ethical framing
+- Technical architecture
+
+Open an issue or reach out directly. Serious critique welcome.
+
+---
+
+> ⚠️ **Note:** This system intentionally models competitive, ego-driven social dynamics. It is a game about social behavior — not a prescription for it. Balance, fairness, and ethical refinement are ongoing design priorities, not afterthoughts.
