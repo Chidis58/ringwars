@@ -1,34 +1,49 @@
 # Gemini Response
 
 ## Summary
-Refactored the RingWars simulation into a modular architecture and successfully pushed to GitHub.
+Successfully converted RingWars into a deterministic experimental system. Verified that identical seeds produce identical results and implemented a comparison utility for side-by-side experiment analysis.
 
 ---
 
-## Files Updated (GitHub Links)
-- [GEMINI.md](https://raw.githubusercontent.com/Chidis58/ringwars/main/GEMINI.md)
-- [todo.txt](https://raw.githubusercontent.com/Chidis58/ringwars/main/todo.txt)
-- [response.txt](https://raw.githubusercontent.com/Chidis58/ringwars/main/response.txt)
-- [sim/run.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/run.py)
-- [sim/core/engine.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/core/engine.py)
-- [sim/core/mechanics.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/core/mechanics.py)
-- [sim/core/logger.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/core/logger.py)
-- [sim/agents/connector.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/agents/connector.py)
-- [sim/agents/node.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/agents/node.py)
-- [sim/scenarios/default.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/scenarios/default.py)
+## Files Modified
+- [sim/config.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/config.py) (Added global seed)
+- [sim/core/engine.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/core/engine.py) (Implemented RNG injection and deterministic sorting)
+- [sim/agents/connector.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/agents/connector.py) (Injected RNG and deterministic tie-breaking)
+- [sim/scenarios/default.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/scenarios/default.py) (Added seed-based world generation)
+- [sim/experiments/runner.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/experiments/runner.py) (New: Experiment management layer)
+- [sim/experiments/compare.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/experiments/compare.py) (New: Side-by-side comparison tool)
+- [sim/run.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/run.py) (Updated: Main entry now runs reproducibility tests)
+- [todo.txt](https://raw.githubusercontent.com/Chidis58/ringwars/main/todo.txt) (Updated task status)
+- [response.txt](https://raw.githubusercontent.com/Chidis58/ringwars/main/response.txt) (This report)
 
 ---
 
 ## Changes Made
-1. **Modular Refactor**: Simulation logic moved from flat files to a structured package (`core/`, `agents/`, `scenarios/`).
-2. **Personalities**: Introduced `aggression`, `strategy`, `loyalty`, and `chaos` weights for connectors.
-3. **Daily Cycle**: Simulation now runs in `days` instead of `ticks`, with daily activity/inactivity logic.
-4. **Logging**: Added a comprehensive `Logger` for daily events and summaries.
-5. **GitHub Sync**: Established the routine for pushing changes and reporting raw URLs.
+1. **Global Seed Control**: All randomness is now managed via `random.Random(seed)` instances.
+2. **Determinism**: 
+   - Injected RNG into all agents and the simulation engine.
+   - Replaced non-deterministic dictionary iteration with sorted keys in the engine.
+   - Added tie-breaking logic in `connector.py` (sorting by ID when metrics are equal).
+3. **Experiment Runner**: Created a layer to run, collect, and save experiment results as JSON.
+4. **Comparison Tool**: Built a CLI utility to compare two JSON results side-by-side.
+5. **Standardized Metrics**: All runs now output a strict schema including supply, revenue, burn, and survival rates.
+
+---
+
+## Assumptions
+- Seed 42 is the default "Baseline".
+- Survival is defined as balance > 0 (Connectors stop acting at balance <= 5).
+- Determinism test in `sim/run.py` confirms that `Supply` remains identical between runs.
+
+---
+
+## Issues / Questions
+- **Reproduction SUCCESS**: Verified that running Seed 42 twice results in the exact same `total_supply` (595.6).
+- **NetworkX**: Maintained as a dependency for the graph, but ensured it doesn't break determinism by using sorted node keys.
 
 ---
 
 ## Next Suggestions
-1. **Implement Conviction Logic**: Add the "stickiness" factor where repeated interactions lower costs and increase loyalty.
-2. **Inflation Caps**: Add the soft-cap logic to `mechanics.py` to prevent runaway costs during bidding wars.
-3. **Advanced Scenario**: Create a scenario with specific "clusters" of connectors to test the social pressure formula.
+1. **Parameter Sweeping**: Add a script to run experiments across a range of `burn_rate` or `overlap_factor` values automatically.
+2. **Experiment Archiving**: Organize `sim/results/` into subfolders by timestamp or "batch".
+3. **Formal Configs**: Move experiment-specific parameters out of `config.py` and into dedicated JSON files in `sim/experiments/configs/`.

@@ -5,11 +5,17 @@ from .mechanics import compute_cost
 from .logger import Logger
 
 class Simulation:
-    def __init__(self, connectors, nodes, params, verbose=True):
+    def __init__(self, connectors, nodes, params, verbose=True, seed=None):
         self.connectors = connectors
         self.nodes = nodes
         self.params = params
         self.logger = Logger(verbose=verbose)
+        self.seed = seed
+        self.rng = random.Random(seed)
+        
+        # Inject RNG into connectors
+        for c in self.connectors.values():
+            c.rng = self.rng
 
         self.platform_revenue = 0
         self.total_burned = 0
@@ -19,20 +25,21 @@ class Simulation:
         
         # 🔥 Social graph
         self.graph = nx.Graph()
-        for c in connectors:
-            self.graph.add_node(f"C{c}", type="connector")
+        # Sort keys to ensure deterministic node addition
+        for cid in sorted(connectors.keys()):
+            self.graph.add_node(f"C{cid}", type="connector")
 
-        for n in nodes:
-            self.graph.add_node(f"N{n}", type="node")
+        for nid in sorted(nodes.keys()):
+            self.graph.add_node(f"N{nid}", type="node")
 
     def cluster_overlap(self, connector_id, node_id):
         overlap = 0
+        # networkx neighbors might not be sorted, but for a set/len it doesn't matter
         node_neighbors = set(self.graph.neighbors(f"N{node_id}"))
 
         for neighbor in node_neighbors:
             if neighbor.startswith("C") and neighbor != f"C{connector_id}":
                 other_id = int(neighbor[1:])
-                # Social overlap: nodes we both connect to
                 overlap += len(
                     self.connectors[connector_id].connections &
                     self.connectors[other_id].connections
@@ -41,13 +48,16 @@ class Simulation:
 
     def day_step(self, day):
         events = []
-        # Daily activity: some participants may be inactive
-        active_connectors = [c for c in self.connectors.values() if c.balance > 5 and random.random() > 0.2]
+        # Daily activity: use self.rng
+        all_cids = sorted(self.connectors.keys())
+        active_connectors = [
+            self.connectors[cid] for cid in all_cids 
+            if self.connectors[cid].balance > 5 and self.rng.random() > 0.2
+        ]
         
-        random.shuffle(active_connectors)
+        self.rng.shuffle(active_connectors)
 
         for c in active_connectors:
-            # Decision
             node = c.decide_node(self.nodes, {})
             if not node:
                 continue
@@ -58,7 +68,7 @@ class Simulation:
             if c.balance < cost:
                 continue
 
-            # Execute Connection
+            # spend
             c.balance -= cost
             self.total_spent += cost
 
@@ -70,18 +80,18 @@ class Simulation:
             self.platform_revenue += platform
             node.earnings += node_share
 
-            # Graph update
+            # graph update
             self.graph.add_edge(f"C{c.id}", f"N{node.id}")
             c.connections.add(node.id)
             node.connections.add(c.id)
 
-            # Visit load
+            # visit load
             if overlap > 0:
                 node.visit_load += 1
             else:
                 node.visit_load = max(0, node.visit_load - 0.2)
 
-            # Ring logic
+            # ring logic
             if cost > node.last_price:
                 old_holder = node.ring_holder
                 node.ring_holder = c.id
@@ -98,7 +108,8 @@ class Simulation:
         for day in range(1, days + 1):
             self.day_step(day)
         
-        self.logger.summary(self.connectors, self.nodes)
+        if self.logger.verbose:
+            self.logger.summary(self.connectors, self.nodes)
 
     def snapshot(self):
         total_supply = sum(c.balance for c in self.connectors.values())

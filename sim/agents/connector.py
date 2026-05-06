@@ -1,13 +1,14 @@
 import random
 
 class Connector:
-    def __init__(self, id, balance, personality):
+    def __init__(self, id, balance, personality, rng=None):
         self.id = id
         self.balance = balance
         self.personality = personality  # dict with weights: aggression, strategy, loyalty, chaos
         self.connections = set()
         self.conviction = {}  # node_id -> score
         self.active = True
+        self.rng = rng or random.Random()
 
     def decide_node(self, nodes, context):
         """
@@ -20,20 +21,22 @@ class Connector:
             return None
         
         # Chaos weight
-        if random.random() < self.personality.get('chaos', 0.1):
-            return random.choice(available_nodes)
+        if self.rng.random() < self.personality.get('chaos', 0.1):
+            return self.rng.choice(available_nodes)
         
         # Strategy: look for low visit load
         if self.personality.get('strategy', 0) > 0.5:
-            available_nodes.sort(key=lambda n: n.visit_load)
+            # Deterministic sort: use node id as secondary key
+            available_nodes.sort(key=lambda n: (n.visit_load, n.id))
             return available_nodes[0]
 
         # Aggression: look for high streak/contested nodes
         if self.personality.get('aggression', 0) > 0.5:
-            available_nodes.sort(key=lambda n: n.streak, reverse=True)
+            # Deterministic sort
+            available_nodes.sort(key=lambda n: (n.streak, n.id), reverse=True)
             return available_nodes[0]
 
-        return random.choice(available_nodes)
+        return self.rng.choice(available_nodes)
 
     def __repr__(self):
         return f"<Connector {self.id} | Bal: {self.balance:.1f} | Pers: {max(self.personality, key=self.personality.get)}>"

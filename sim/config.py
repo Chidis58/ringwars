@@ -1,4 +1,5 @@
 PARAMS = {
+    "seed": 42,
     "base_cost": 10,
     "overlap_factor": 0.15,
     "streak_factor": 0.10,
