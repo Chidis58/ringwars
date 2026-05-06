@@ -3,6 +3,7 @@ import random
 import networkx as nx
 from .mechanics import compute_cost
 from .logger import Logger
+from ..observability.logger import ObservabilityLogger
 
 class Simulation:
     def __init__(self, connectors, nodes, params, verbose=True, seed=None):
@@ -10,6 +11,7 @@ class Simulation:
         self.nodes = nodes
         self.params = params
         self.logger = Logger(verbose=verbose)
+        self.obs_logger = ObservabilityLogger()
         self.seed = seed
         self.rng = random.Random(seed)
         
@@ -25,7 +27,6 @@ class Simulation:
         
         # 🔥 Social graph
         self.graph = nx.Graph()
-        # Sort keys to ensure deterministic node addition
         for cid in sorted(connectors.keys()):
             self.graph.add_node(f"C{cid}", type="connector")
 
@@ -34,7 +35,6 @@ class Simulation:
 
     def cluster_overlap(self, connector_id, node_id):
         overlap = 0
-        # networkx neighbors might not be sorted, but for a set/len it doesn't matter
         node_neighbors = set(self.graph.neighbors(f"N{node_id}"))
 
         for neighbor in node_neighbors:
@@ -48,7 +48,6 @@ class Simulation:
 
     def day_step(self, day):
         events = []
-        # Daily activity: use self.rng
         all_cids = sorted(self.connectors.keys())
         active_connectors = [
             self.connectors[cid] for cid in all_cids 
@@ -58,12 +57,17 @@ class Simulation:
         self.rng.shuffle(active_connectors)
 
         for c in active_connectors:
-            node = c.decide_node(self.nodes, {})
+            node, reason = c.decide_node(self.nodes, {})
             if not node:
                 continue
 
             overlap = self.cluster_overlap(c.id, node.id)
             cost = compute_cost(c, node, overlap, self.params)
+
+            # Log decision to observability layer
+            self.obs_logger.log_decision(
+                day, c.id, node.id, cost, c.personality, reason
+            )
 
             if c.balance < cost:
                 continue

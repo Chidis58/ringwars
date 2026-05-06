@@ -1,150 +1,23 @@
-## Context
-You are working on the RingWars simulation project.
+Do NOT add new mechanics.
 
-The codebase has recently been refactored into:
-- sim/core/
-- sim/agents/
-- sim/scenarios/
-- sim/output/
+Add an OBSERVABILITY LAYER to the simulation.
 
-Personality system and daily simulation exist.
+Goal: make every decision explainable.
 
-However, the system is currently NOT experimentally stable.
+Requirements:
 
----
+1. Create sim/observability/ layer
+2. Log every connector decision:
+   - selected node
+   - cost
+   - personality influence breakdown (weighted contribution)
+3. Store decision logs per day
+4. Extend experiment output to include:
+   - top 10 most expensive decisions
+   - most influential personality trait per run
+5. Keep CLI-only output
+6. Do NOT modify engine logic, only wrap it with logging
 
-## CRITICAL GOAL
-
-Stabilize the simulation into a **repeatable experiment system**.
-
-Do NOT add new gameplay mechanics.
-
-Do NOT expand architecture further.
-
-Focus ONLY on:
-
-1. Deterministic behavior
-2. Experiment control
-3. Metrics consistency
-4. Reproducibility
-
----
-
-## REQUIRED CHANGES
-
-### 1. Add Global Seed Control (IMPORTANT)
-
-Ensure full reproducibility:
-
-- Add a single seed entry point (config or run.py)
-- All randomness must use this seed
-- No uncontrolled random calls outside seeded RNG
-
----
-
-### 2. Introduce Experiment Runner Layer
-
-Create a new file:
-
-sim/experiments/runner.py
-
-It must support:
-
-- run_experiment(config, seed)
-- run_multiple_experiments(list_of_configs)
-- collect_results()
-
-Each experiment must return structured output only.
-
----
-
-### 3. Standardize Metrics Output (VERY IMPORTANT)
-
-All simulation runs MUST return this exact schema:
-
-{
-  "experiment_name": str,
-  "seed": int,
-  "total_supply": float,
-  "platform_revenue": float,
-  "burned": float,
-  "avg_visit_load": float,
-  "survival_rate": float,
-  "winner_connectors": list,
-  "top_nodes": list
-}
-
-No extra fields allowed in final output.
-
----
-
-### 4. Freeze Engine Behavior
-
-- Do NOT modify mechanics or personality logic
-- Only ensure engine is deterministic and cleanly called
-- Remove any hidden randomness not controlled by seed
-
----
-
-### 5. Add Comparison Utility
-
-Create:
-
-sim/experiments/compare.py
-
-It should:
-
-- take two experiment results (A and B)
-- print side-by-side differences:
-  - inflation difference
-  - survival difference
-  - revenue difference
-  - winner shifts
-
-Output must be CLI text only.
-
----
-
-## STRICT RULES
-
-- No new mechanics
-- No UI work
-- No visualization
-- No NetworkX changes
-- No redesign of agent logic
-
-Only:
-→ reproducibility
-→ experiment control
-→ metrics discipline
-
----
-
-## OUTPUT FORMAT
-
-For each run, print:
-
-### Experiment Summary
-- Seed
-- Config used
-- Key metrics
-
-### Then save JSON result to:
-sim/results/
-
----
-
-## SUCCESS CRITERIA
-
-After this change:
-
-1. Running same config + seed must produce identical results
-2. Two configs must be directly comparable
-3. Outputs must be structured and consistent
-4. No hidden randomness anywhere
-
----
-
-## IMPORTANT
-
-This step is about turning RingWars into a **scientific simulation system**, not a game expansion system.
+Success criteria:
+- I can explain WHY every interaction happened
+- I can trace economy changes back to decisions

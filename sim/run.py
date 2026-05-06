@@ -14,6 +14,10 @@ def main():
     print(f"  Supply: {baseline_res['total_supply']:.1f}")
     print(f"  Survival: {baseline_res['survival_rate']*100:.1f}%")
     
+    obs = baseline_res.get("observability", {})
+    print(f"  Most Influential Trait: {obs.get('most_influential_trait')}")
+    print(f"  Top Expensive Decision: {obs.get('top_expensive_decisions')[0] if obs.get('top_expensive_decisions') else 'N/A'}")
+
     # 2. Reproduction Check (Same seed)
     print("\nRunning Reproduction Check (Seed 42)...")
     repro_res = run_experiment("repro", PARAMS, seed=42)
@@ -23,12 +27,6 @@ def main():
     else:
         print("  FAILURE: Determinism broken.")
         print(f"  Diff: {repro_res['total_supply'] - baseline_res['total_supply']}")
-
-    # 3. Alternative Seed
-    print("\nRunning Alternative Seed (Seed 123)...")
-    alt_res = run_experiment("alt_seed", PARAMS, seed=123)
-    print(f"  Seed: {alt_res['seed']}")
-    print(f"  Supply: {alt_res['total_supply']:.1f}")
 
 if __name__ == "__main__":
     main()

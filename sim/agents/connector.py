@@ -13,30 +13,27 @@ class Connector:
     def decide_node(self, nodes, context):
         """
         Decision logic based on personality.
-        context: might include current market prices, graph state, etc.
+        Returns: (Node, reason_string)
         """
-        # Simple implementation for now
         available_nodes = list(nodes.values())
         if not available_nodes:
-            return None
+            return None, "no_nodes"
         
         # Chaos weight
         if self.rng.random() < self.personality.get('chaos', 0.1):
-            return self.rng.choice(available_nodes)
+            return self.rng.choice(available_nodes), "chaos"
         
         # Strategy: look for low visit load
         if self.personality.get('strategy', 0) > 0.5:
-            # Deterministic sort: use node id as secondary key
             available_nodes.sort(key=lambda n: (n.visit_load, n.id))
-            return available_nodes[0]
+            return available_nodes[0], "strategy"
 
         # Aggression: look for high streak/contested nodes
         if self.personality.get('aggression', 0) > 0.5:
-            # Deterministic sort
             available_nodes.sort(key=lambda n: (n.streak, n.id), reverse=True)
-            return available_nodes[0]
+            return available_nodes[0], "aggression"
 
-        return self.rng.choice(available_nodes)
+        return self.rng.choice(available_nodes), "random_fallback"
 
     def __repr__(self):
         return f"<Connector {self.id} | Bal: {self.balance:.1f} | Pers: {max(self.personality, key=self.personality.get)}>"

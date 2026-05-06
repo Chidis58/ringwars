@@ -38,6 +38,10 @@ def run_experiment(name, config, seed=None):
         reverse=True
     )[:5]
     
+    # Observability metrics
+    top_expensive = sim.obs_logger.get_top_expensive(10)
+    influential_trait = sim.obs_logger.get_influential_trait()
+    
     result = {
         "experiment_name": name,
         "seed": exp_seed,
@@ -47,7 +51,11 @@ def run_experiment(name, config, seed=None):
         "avg_visit_load": final_snapshot["avg_visit_load"],
         "survival_rate": final_snapshot["survival_rate"],
         "winner_connectors": winners,
-        "top_nodes": top_nodes
+        "top_nodes": top_nodes,
+        "observability": {
+            "top_expensive_decisions": top_expensive,
+            "most_influential_trait": influential_trait
+        }
     }
     
     # Save to results/
