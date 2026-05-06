@@ -1,27 +1,18 @@
-from .entities import Connector, Node
-from .engine import Simulation
-from .config import PARAMS
-from .visualize import plot_metrics, draw_graph
-import random
 
+from sim.scenarios.default import create_world
+from sim.core.engine import Simulation
+from sim.config import PARAMS
+import sys
 
-def create_world(n_connectors=20, n_nodes=20):
-    connectors = {
-        i: Connector(i, random.uniform(200, 500), "balanced")
-        for i in range(n_connectors)
-    }
-
-    nodes = {i: Node(i) for i in range(n_nodes)}
-    return connectors, nodes
-
-
-
-if __name__ == "__main__":
-    connectors, nodes = create_world()
+def main():
+    print("Initializing RingWars Simulation...")
+    connectors, nodes = create_world(n_connectors=15, n_nodes=10)
 
     sim = Simulation(connectors, nodes, PARAMS)
-    sim.run(ticks=500)
+    
+    days = 10
+    print(f"Running for {days} days...")
+    sim.run(days=days)
 
-    plot_metrics(sim.history)     # 📊 charts
-    draw_graph(sim.graph)         # 🌐 network view
-
+if __name__ == "__main__":
+    main()

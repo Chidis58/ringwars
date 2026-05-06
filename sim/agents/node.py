@@ -1,13 +1,4 @@
 
-class Connector:
-    def __init__(self, id, balance, strategy):
-        self.id = id
-        self.balance = balance
-        self.connections = set()
-        self.conviction = {}
-        self.strategy = strategy
-
-
 class Node:
     def __init__(self, id):
         self.id = id
@@ -17,3 +8,6 @@ class Node:
         self.last_price = 10
         self.earnings = 0
         self.streak = 0
+
+    def __repr__(self):
+        return f"<Node {self.id} | Load: {self.visit_load:.1f} | Ring: {self.ring_holder}>"

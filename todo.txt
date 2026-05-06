@@ -1,0 +1,53 @@
+# RingWars Task Instruction
+
+## Context
+You are working on a Python simulation project called "RingWars".
+
+- Environment: Termux (Android)
+- Constraints:
+  - Limited CPU/RAM
+  - CLI-only output
+  - No UI frameworks
+  - Keep dependencies minimal
+
+---
+
+## Current Goal
+Refactor the existing simulation into a modular architecture.
+
+Target structure:
+sim/
+  core/
+  agents/
+  scenarios/
+  output/
+
+Requirements:
+- Move Connector and Node into agents/
+- Move engine logic into core/
+- Introduce personality mix (aggression, strategy, loyalty, chaos)
+- Convert simulation from ticks -> days
+- Add daily activity (some participants inactive)
+- Add clear logging system
+
+Output:
+- CLI readable daily logs
+- Connector summary
+- Node summary
+
+Do not add new mechanics yet.
+Focus only on restructuring and clarity.
+
+---
+
+## Deliverables
+1. List of files modified
+2. Explanation of what was done
+3. Any assumptions made
+4. Any issues or uncertainties
+
+---
+
+## Important
+Write your response to response.txt
+Do not print long explanations to terminal
