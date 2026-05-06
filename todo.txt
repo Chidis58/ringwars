@@ -1,23 +1,165 @@
-Do NOT add new mechanics.
+## Context
+We are adding a CLI interactive mode to RingWars.
 
-Add an OBSERVABILITY LAYER to the simulation.
+This must NOT affect the existing experiment system.
 
-Goal: make every decision explainable.
+The interactive mode will allow a human to participate as either:
+- Connector (C*)
+- Node (N*)
 
-Requirements:
+Environment:
+- Termux (Android)
+- CLI only
+- No UI libraries
+- Keep it lightweight
 
-1. Create sim/observability/ layer
-2. Log every connector decision:
-   - selected node
-   - cost
-   - personality influence breakdown (weighted contribution)
-3. Store decision logs per day
-4. Extend experiment output to include:
-   - top 10 most expensive decisions
-   - most influential personality trait per run
-5. Keep CLI-only output
-6. Do NOT modify engine logic, only wrap it with logging
+---
 
-Success criteria:
-- I can explain WHY every interaction happened
-- I can trace economy changes back to decisions
+## Task
+
+Create a new module:
+
+sim/interactive/
+  - cli.py
+  - player.py
+
+---
+
+## Requirements
+
+### 1. Entry Flow
+
+When running:
+
+python sim/interactive/cli.py
+
+Prompt:
+
+1. "Do you want to participate? (y/n)"
+   - if "n" → exit
+
+2. "Choose role:"
+   - 1 = Connector
+   - 2 = Node
+
+3. Show available IDs based on scenario:
+   - Connectors: C0 ... Cn
+   - Nodes: N0 ... Nn
+
+4. User selects ID
+
+---
+
+### 2. Human Player Class
+
+Create:
+
+sim/interactive/player.py
+
+Class:
+
+HumanPlayer:
+- role (connector/node)
+- id
+
+Method:
+
+choose_action(state)
+
+If Connector:
+- show available nodes
+- show estimated cost (if possible)
+- input: node id or "skip"
+
+If Node:
+- show incoming connectors (if any)
+- input:
+    1 = encourage (reduce cost)
+    2 = neutral
+    3 = discourage (increase cost)
+
+Return structured action:
+{
+  "type": "connect" or "skip" or "influence",
+  "target": node_id (if applicable),
+  "mode": optional (for node)
+}
+
+---
+
+### 3. Engine Integration
+
+Modify run loop ONLY for interactive mode:
+
+Each day:
+
+- show day number
+- show user status:
+  - if connector: balance, wins, connections
+  - if node: earnings, visit load, current ring holder
+
+- call:
+  action = HumanPlayer.choose_action(state)
+
+- pass action into engine BEFORE other agents act
+
+- other agents act normally
+
+---
+
+### 4. Daily Output
+
+Print:
+
+--- Day X ---
+
+Your action:
+C1 → N2 (cost: 14.2)
+
+Top events:
+C3 → N2 (cost: 18.1) 💍 stolen
+
+System:
+Avg ⤵️:
+Total supply:
+
+---
+
+### 5. Final Output
+
+After simulation ends:
+
+--- FINAL RESULTS ---
+
+You:
+- final balance / earnings
+- wins
+- rank (if applicable)
+
+Top Connector:
+Top Node:
+
+---
+
+## Constraints
+
+- DO NOT modify sim/experiments/
+- DO NOT break determinism there
+- DO NOT add new mechanics
+- DO NOT use any UI libraries
+- Use only print() and input()
+
+---
+
+## Deliverables
+
+1. sim/interactive/cli.py
+2. sim/interactive/player.py
+3. Working interactive run
+4. Example terminal output
+
+---
+
+## Goal
+
+Allow a human to play inside the simulation without affecting the experiment system.

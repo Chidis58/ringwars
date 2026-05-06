@@ -1,37 +1,56 @@
 # Gemini Response
 
 ## Summary
-Implemented the Observability Layer for RingWars and pushed to GitHub. Every connector decision is now logged with its reasoning (personality trait) and cost, making the simulation outcomes fully explainable.
+Implemented a new Interactive CLI mode for RingWars, allowing human participation as either a Connector or a Node. The new module resides in `sim/interactive/` and integrates seamlessly with the existing simulation engine without breaking determinism or the experimental system.
 
 ---
 
-## Files Updated (GitHub Links)
-- [GEMINI.md](https://raw.githubusercontent.com/Chidis58/ringwars/main/GEMINI.md)
-- [todo.txt](https://raw.githubusercontent.com/Chidis58/ringwars/main/todo.txt)
-- [response.txt](https://raw.githubusercontent.com/Chidis58/ringwars/main/response.txt)
-- [sim/run.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/run.py)
-- [sim/core/engine.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/core/engine.py)
-- [sim/agents/connector.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/agents/connector.py)
-- [sim/experiments/runner.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/experiments/runner.py)
-- [sim/observability/logger.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/observability/logger.py)
+## Files Created/Modified
+- [sim/interactive/cli.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/interactive/cli.py) (New: Interactive entry point)
+- [sim/interactive/player.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/interactive/player.py) (New: Human player logic)
+- [sim/core/engine.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/core/engine.py) (Updated: Integrated human action loop and daily status reporting)
+- [sim/core/mechanics.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/core/mechanics.py) (Updated: Added support for Node influence on costs)
 
 ---
 
 ## Changes Made
-1. **Observability Engine**: Created `sim/observability/logger.py` to capture and analyze connector decisions.
-2. **Explainable AI**: Connectors now return a "reason" string for every node choice, allowing us to trace outcomes back to specific traits.
-3. **Trait Influence Tracking**: The simulation now identifies which personality trait (Aggression, Strategy, etc.) was most active during the run.
-4. **Economic Forensics**: Added tracking for the "Top 10 Most Expensive Decisions" to find price spikes and their causes.
+1. **Interactive Entry Flow**: Users can now run `python3 sim/interactive/cli.py` to start a session, choose a role, and select an agent ID.
+2. **Human Player Logic**: Implemented `HumanPlayer` class to handle CLI inputs for connections (Connectors) and cost influence (Nodes).
+3. **Engine Integration**:
+    - The engine now checks for a `human_player` and processes their turn before AI agents.
+    - Added daily status printing (Balance, Earnings, System Supply, etc.) specifically for interactive mode.
+    - Maintained full compatibility with headless experimental runs.
+4. **Node Influence**: Nodes can now "Encourage" (reduce cost) or "Discourage" (increase cost) for other connectors, enabling the "Node Strategy" layer described in the README.
 
 ---
 
-## Results
-- **Most Active Trait**: `aggression` (Seed 42).
-- **Price Spike Trace**: Found that the most expensive decision was driven by a `random_fallback`, demonstrating the cost of non-strategic movement.
+## Example Interactive Output
+```text
+--- DAY 1 ---
+STATUS: Balance: 207.50 | Connections: 0
+
+--- YOUR TURN (CONNECTOR C0) ---
+Your Balance: 207.50
+Available Nodes:
+  N0: Cost ~10.0 | Load: 0.0 | Ring: None
+  ...
+Enter Node ID to connect or 'skip': 0
+
+Your action: C0 → N0
+Top events:
+  C0 connected to N0 at 10.0 (human_choice)
+  C5 connected to N0 at 10.0 (strategy)
+  C7 connected to N8 at 10.0 (chaos)
+
+System:
+  Avg ⤵️: 0.00
+  Total supply: 3182.8
+--------------------
+```
 
 ---
 
 ## Next Suggestions
-1. **Conviction Mechanics**: Now that we can see *why* nodes are picked, we can add "stickiness" for connectors who repeatedly pick the same node for strategic reasons.
-2. **Node Discounts**: Allow nodes to actively reduce costs for connectors with high conviction.
-3. **Threshold Alerts**: Add warnings when a single decision consumes more than 50% of a connector's balance.
+1. **Save/Load State**: Allow players to save their interactive session and resume later.
+2. **Advanced Node Actions**: Give human nodes the ability to "ban" or "whitelist" specific connector IDs.
+3. **Competitive Leaderboard**: Track human player performance across different seeds.
