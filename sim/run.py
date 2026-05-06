@@ -1,12 +1,13 @@
-import random
 from .entities import Connector, Node
 from .engine import Simulation
 from .config import PARAMS
-from .metrics import summarize
+from .visualize import plot_metrics, draw_graph
+import random
 
-def create_world(n_connectors=50, n_nodes=20):
+
+def create_world(n_connectors=20, n_nodes=20):
     connectors = {
-        i: Connector(i, random.uniform(200, 500), random.choice(["explore", "compete", "balanced"]))
+        i: Connector(i, random.uniform(200, 500), "balanced")
         for i in range(n_connectors)
     }
 
@@ -14,10 +15,13 @@ def create_world(n_connectors=50, n_nodes=20):
     return connectors, nodes
 
 
+
 if __name__ == "__main__":
     connectors, nodes = create_world()
-    sim = Simulation(connectors, nodes, PARAMS)
 
+    sim = Simulation(connectors, nodes, PARAMS)
     sim.run(ticks=500)
 
-    print(summarize(sim))
+    plot_metrics(sim.history)     # 📊 charts
+    draw_graph(sim.graph)         # 🌐 network view
+

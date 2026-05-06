@@ -33,4 +33,5 @@ dist/
 
 # Simulation outputs (if you add logs later)
 sim/output/
-sim/results/
+sim/results/*
+!sim/results/.gitkeep
