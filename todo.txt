@@ -1,81 +1,23 @@
-Update interactive CLI visual system.
+# RingWars Development Roadmap
 
-Do NOT change simulation logic.
+## ✅ Completed: UI Transformation (Interactive Mode)
+- [x] Global symbol replacement (Connector → 🕺, Node → 💃, Visit Load → 🤱).
+- [x] Prefix emoji formatting (🪙10.00, 🔁REVISIT, 🫂NEW).
+- [x] Compact command interface (v<id>, s, >, <<).
+- [x] Centered day headers and horizontal footers.
+- [x] Human action history tracking in final results.
+- [x] Removal of skin tone modifiers for base emoji consistency.
 
----
+## 🔜 Upcoming: Game Mechanics & Balance
+- [ ] Implement Conviction Score decay logic in `sim/core/mechanics.py`.
+- [ ] Tune cluster pressure formulas to prevent runaway inflation.
+- [ ] Add "Lock State" for Nodes with maximum 🤱 (Visit Load).
+- [ ] Refine AI personalities (Chaos vs Strategy vs Aggression) in `sim/agents/`.
 
-1. Replace role symbols:
-
-Connector → 🕺
-Node → 💃
-Visit Load → 🤱
-All IDs must be formatted as:
-🕺3
-💃6
-
-Never use C3 / N6 in UI.
-
----
-
-2. Interaction display
-
-New connection:
-🕺3 🤝 💃6
-
-Revisit:
-🕺3 🔁 💃6
+## 🧪 Simulation Goals
+- [ ] Run 100-day balance test to verify token supply stability.
+- [ ] Validate Node influence factors (Encourage/Discourage) on AI behavior.
+- [ ] Test social graph density impacts on connection costs.
 
 ---
-
-3. Map display
-
-Format:
-
-💃6 | 🤱 2.0 | 💍 🕺3
-
-If highly contested (high load or frequent ring change), add 🔥
-
----
-
-4. Pre-action confirmation
-
-Show:
-
-Target: 💃6
-Type: NEW 🤝 or REVISIT 🔁
-Cost: X 🪙
-
-Proceed? (y/n)
-
----
-
-5. Logs / Events
-
-Replace all C / N references with emoji format:
-
-Example:
-
-🕺3 🤝 💃6 at 10.0 🪙 (human_choice)
-🕺5 took 💍 of 💃2 from 🕺1 at 18.4 🪙
-
----
-
-6. Final summary
-
-All participants must display as:
-
-🕺0 | Balance: X
-💃0 | 🤱 X | 💍 🕺Y
-
----
-
-7. Input logic remains:
-
-If player enters a number:
-- Connector → target 💃N
-- Node → target 🕺N
-
----
-
-Focus only on presentation layer.
-Do not modify mechanics or calculations.
+*Note: Maintain established 🕺/💃/🤱/🪙/🫂 iconography in all future updates.*
