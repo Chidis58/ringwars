@@ -9,3 +9,12 @@ PARAMS = {
     "visit_load_cap": 10,
     "conviction_decay": 0.01,
 }
+
+EXPERIMENTS = {
+    "revenge_bidding": True,
+    "connector_alliances": False,
+    "hidden_nodes": False,
+    "ring_decay": False,
+    "emotional_escalation": True,
+}
+

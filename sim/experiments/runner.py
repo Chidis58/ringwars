@@ -3,24 +3,27 @@ import json
 import os
 from ..core.engine import Simulation
 from ..scenarios.default import create_world
+from ..config import EXPERIMENTS
 
-def run_experiment(name, config, seed=None):
+def run_experiment(name, config, seed=None, experiments=None):
     """
     Runs a single experiment with a given name, config (params), and seed.
     """
     exp_seed = seed if seed is not None else config.get("seed", 42)
-    
+    exp_flags = experiments or EXPERIMENTS
+
     # Initialize world
     connectors, nodes = create_world(
         n_connectors=config.get("n_connectors", 20),
         n_nodes=config.get("n_nodes", 20),
         seed=exp_seed
     )
-    
+
     # Run simulation
-    sim = Simulation(connectors, nodes, config, verbose=False, seed=exp_seed)
-    sim.run(days=config.get("days", 30))
-    
+    output_dir = f"sim/output/{name}_s{exp_seed}"
+    sim = Simulation(connectors, nodes, config, verbose=False, seed=exp_seed, experiments=exp_flags)
+    sim.run(days=config.get("days", 30), output_dir=output_dir)
+
     # Collect results
     final_snapshot = sim.history[-1]
     

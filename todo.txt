@@ -1,23 +1,225 @@
-# RingWars Development Roadmap
+# RingWars — IMPORTANT DIRECTION CORRECTION (MECHANICS ONLY)
 
-## ✅ Completed: UI Transformation (Interactive Mode)
-- [x] Global symbol replacement (Connector → 🕺, Node → 💃, Visit Load → 🤱).
-- [x] Prefix emoji formatting (🪙10.00, 🔁REVISIT, 🫂NEW).
-- [x] Compact command interface (v<id>, s, >, <<).
-- [x] Centered day headers and horizontal footers.
-- [x] Human action history tracking in final results.
-- [x] Removal of skin tone modifiers for base emoji consistency.
+## Context
 
-## 🔜 Upcoming: Game Mechanics & Balance
-- [ ] Implement Conviction Score decay logic in `sim/core/mechanics.py`.
-- [ ] Tune cluster pressure formulas to prevent runaway inflation.
-- [ ] Add "Lock State" for Nodes with maximum 🤱 (Visit Load).
-- [ ] Refine AI personalities (Chaos vs Strategy vs Aggression) in `sim/agents/`.
+The previous Gemini CLI changes were primarily focused on:
+- CLI/UI formatting
+- command shortcuts
+- presentation improvements
 
-## 🧪 Simulation Goals
-- [ ] Run 100-day balance test to verify token supply stability.
-- [ ] Validate Node influence factors (Encourage/Discourage) on AI behavior.
-- [ ] Test social graph density impacts on connection costs.
+These changes are NOT aligned with the current goal.
 
 ---
-*Note: Maintain established 🕺/💃/🤱/🪙/🫂 iconography in all future updates.*
+
+## 🎯 Core Objective Reminder
+
+This project is NOT focused on:
+- UI/CLI improvements
+- presentation polish
+- command ergonomics
+- refactoring structure
+
+This project IS focused on:
+> testing social mechanics, economy behavior, and emergent dynamics.
+
+---
+
+## ❗ Immediate Instruction
+
+Before making any further changes:
+
+### 1. Stop UI / CLI work
+Do NOT modify:
+- `sim/interactive/*`
+- `cli.py`
+- formatting, emojis, or command UX
+- logging presentation layer
+
+---
+
+### 2. Focus ONLY on simulation behavior
+
+Work ONLY on:
+
+- `sim/core/mechanics.py`
+- `sim/core/engine.py` (logic only, not UI concerns)
+- `sim/config.py`
+- `sim/agents/*`
+- `sim/scenarios/*`
+
+---
+
+## 🧪 Required Next Work
+
+Implement or verify the following experimental mechanics:
+
+### A. Social Mechanic Experiments
+
+Add togglable experiment flags:
+
+```python id="m8xv2q"
+EXPERIMENTS = {
+    "revenge_bidding": True,
+    "connector_alliances": False,
+    "hidden_nodes": False,
+    "ring_decay": False,
+    "emotional_escalation": True,
+}
+
+Each flag MUST directly affect simulation outcomes.
+
+
+---
+
+B. Observability (CRITICAL)
+
+Add event-level logging (NOT UI formatting):
+
+Log raw events such as:
+
+ring transfers
+
+cost spikes
+
+bankruptcies
+
+saturation locks
+
+cluster formation changes
+
+revenge triggers
+
+
+Example format:
+
+EVENT: RING_TRANSFER
+tick: 142
+node: N4
+from: C2
+to: C7
+cost_multiplier: 2.3
+
+
+---
+
+C. Experiment Output Requirement
+
+After every simulation run, generate:
+
+metrics.json (numeric results only)
+
+events.log (raw event stream)
+
+experiment_report.md (analysis summary)
+
+history.json (tick-level state snapshot)
+
+
+
+---
+
+D. Experiment Report Format
+
+# EXPERIMENT: <name>
+
+## INPUT
+- list active experiment flags
+
+## RESULTS
+- inflation behavior
+- survival rate
+- dominant nodes
+- collapse events
+
+## OBSERVATIONS
+- emergent behaviors
+- unexpected dynamics
+
+## CONCLUSION
+- keep / modify / discard mechanic
+
+
+---
+
+E. Strategy Variation (Minimal Only)
+
+Introduce simple agent behavior differences:
+
+AGGRESSIVE
+
+EXPLORER
+
+DEFENSIVE
+
+WHALE
+
+
+They should ONLY affect:
+
+spending behavior
+
+target selection
+
+risk tolerance
+
+
+No complex AI systems.
+
+
+---
+
+🚫 STRICT CONSTRAINTS
+
+DO NOT:
+
+modify UI / CLI layer
+
+improve formatting or emoji system
+
+refactor project structure
+
+build dashboards
+
+create APIs
+
+introduce databases
+
+optimize for production
+
+
+
+---
+
+🧠 Success Criteria
+
+This branch is successful ONLY if:
+
+new mechanics change simulation outcomes
+
+emergent behavior becomes observable
+
+experiments can be compared clearly
+
+UI remains unchanged
+
+
+
+---
+
+🎯 Final Instruction
+
+Treat this system as:
+
+> a social mechanics laboratory, not a product UI.
+
+
+
+All changes must increase ability to:
+
+observe behavior
+
+test hypotheses
+
+compare experiments
+
+detect emergent patterns

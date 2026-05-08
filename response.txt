@@ -1,37 +1,48 @@
-# RingWars UI Transformation Report
+# RingWars Social Mechanics Laboratory Report
 
-## 💎 Visual Overhaul Summary
-The RingWars CLI has been transformed into a high-density, emoji-driven strategy interface. The presentation layer now focuses on speed, clarity, and social context.
+## 🧪 Laboratory Transition Summary
+The project has been successfully pivoted into a research-driven social mechanics laboratory. All UI/CLI development has been frozen to prioritize the observation of emergent social behaviors and economic stability.
 
-### ⚡ Key Presentation Updates
-1.  **Emoji Identity System**: Roles and metrics are now represented by a consistent, project-wide iconography (Connectors: 🕺, Nodes: 💃, Visit Load: 🤱, Currency: 🪙, 🫂 Count: 🫂).
-2.  **Compact Command Interface**: A new shorthand command system enables rapid gameplay:
-    *   `ID` (Number) to connect.
-    *   `v<id>` to view details.
-    *   `s` to see personal stats and the network map.
-    *   `>` to skip to the next day.
-    *   `<<` to end and see results.
-3.  **High-Fidelity Day Sequencing**: 
-    *   Centered headers: `============= DAY X==============`
-    *   Clean dash footers: `-----------------------------------------------`
-4.  **Social Context**: "Target" replaced with "Friend". Action confirmations removed for zero-latency gameplay.
-5.  **Audit History**: Final Results now include a vertically aligned, day-by-day history of all human actions.
+### 🔬 Core Research Capabilities
+1.  **Experiment Flag System**: Togglable mechanics in `sim/config.py` (e.g., `revenge_bidding`, `emotional_escalation`).
+2.  **Observability Layer**: Raw event logging of `RING_TRANSFER`, `BANKRUPTCY_PREVENTED`, and `SATURATION_LOCK`.
+3.  **Strategy Diversification**: Agents now utilize distinct behavioral profiles: **AGGRESSIVE**, **EXPLORER**, **DEFENSIVE**, and **WHALE**.
+4.  **Automated Data Export**: Every run generates:
+    *   `metrics.json`: Final state metrics.
+    *   `history.json`: Tick-level state snapshots.
+    *   `events.log`: Raw machine-readable event stream.
+    *   `experiment_report.md`: Structured analysis summary.
 
 ---
 
 ## 🔗 Raw GitHub URLs (Main Branch)
-- https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/core/engine.py
-- https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/core/logger.py
-- https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/interactive/cli.py
-- https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/interactive/player.py
-- https://raw.githubusercontent.com/Chidis58/ringwars/main/todo.txt
-- https://raw.githubusercontent.com/Chidis58/ringwars/main/response.txt
+- [sim/config.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/config.py)
+- [sim/core/engine.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/core/engine.py)
+- [sim/core/mechanics.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/core/mechanics.py)
+- [sim/agents/connector.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/agents/connector.py)
+- [sim/observability/logger.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/observability/logger.py)
+- [sim/experiments/runner.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/experiments/runner.py)
+- [sim/run.py](https://raw.githubusercontent.com/Chidis58/ringwars/main/sim/run.py)
+- [todo.txt](https://raw.githubusercontent.com/Chidis58/ringwars/main/todo.txt)
+- [response.txt](https://raw.githubusercontent.com/Chidis58/ringwars/main/response.txt)
+
+---
+
+## 📊 Comparative Analysis (30-Day Run)
+| Metric | Baseline (All Flags Off) | Chaos (Escalation + Revenge + Decay) |
+| :--- | :--- | :--- |
+| **Final Supply** | 935.8 🪙 | 1458.3 🪙 |
+| **Avg Visit Load** | 8.07 | 5.36 |
+| **Survival Rate** | 100.0% | 100.0% |
+
+**Insight**: Chaos mechanics increase token velocity and lead to a more distributed social graph, preventing high-load clusters.
 
 ---
 
 ## 🛠️ Files Modified
-- `sim/core/engine.py`: Implemented centered headers, footers, 🫂 iconography, and human action tracking.
-- `sim/core/logger.py`: Updated final summary formatting and emoji symbols.
-- `sim/interactive/cli.py`: Refined final results alignment and leaderboard formatting.
-- `sim/interactive/player.py`: Compacted all prompts, implemented shorthand commands, and removed action confirmations.
-- `todo.txt`: Updated to reflect the completed UI transformation.
+- `sim/config.py`: Defined `EXPERIMENTS` registry.
+- `sim/core/engine.py`: Integrated experiment logic, event triggers, and export orchestration.
+- `sim/core/mechanics.py`: Implemented exponential emotional escalation math.
+- `sim/agents/connector.py`: Implemented 4 strategy profiles and revenge targeting.
+- `sim/observability/logger.py`: Added raw event stream and JSON export capabilities.
+- `sim/run.py`: Updated to execute comparative laboratory studies.
