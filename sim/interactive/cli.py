@@ -33,13 +33,15 @@ def main():
     if role == 'connector':
         print("\nAvailable Connectors:")
         for cid in connectors.keys():
-            print(f"  C{cid}")
-        player_id = int(input("Select your ID: ").strip())
+            print(f"  🕺{cid}")
+        raw_id = input("Select your ID: ").strip().upper()
+        player_id = int(raw_id.replace('🕺', '').replace('C', ''))
     else:
         print("\nAvailable Nodes:")
         for nid in nodes.keys():
-            print(f"  N{nid}")
-        player_id = int(input("Select your ID: ").strip())
+            print(f"  💃{nid}")
+        raw_id = input("Select your ID: ").strip().upper()
+        player_id = int(raw_id.replace('💃', '').replace('N', ''))
 
     human = HumanPlayer(role, player_id)
     
@@ -54,21 +56,36 @@ def main():
     print("\n--- FINAL RESULTS ---")
     if role == 'connector':
         me = sim.connectors[player_id]
-        print(f"You (C{player_id}):")
-        print(f"  Final Balance: {me.balance:.2f}")
-        print(f"  Connections: {len(me.connections)}")
+        print(f"You ({'🕺' + str(player_id)}):")
+        print(f"  Final Balance: 🪙{me.balance:.2f}")
+        print(f"  🫂 Count:      {len(me.connections)}")
+        
+        # Determine max width for Day labels to align history
+        if sim.human_history:
+            max_day_len = max(len(entry.split(": ", 1)[0]) for entry in sim.human_history) + 2
+            for entry in sim.human_history:
+                parts = entry.split(": ", 1)
+                day_label = f"{parts[0]}: "
+                print(f"  {day_label:<{max_day_len}}{parts[1]}")
     else:
         me = sim.nodes[player_id]
-        print(f"You (N{player_id}):")
-        print(f"  Final Earnings: {me.earnings:.2f}")
-        print(f"  Visit Load: {me.visit_load:.2f}")
+        print(f"You ({'💃' + str(player_id)}):")
+        print(f"  Final Earnings: 🪙{me.earnings:.2f}")
+        print(f"  🤱:             {me.visit_load:.2f}")
+        
+        if sim.human_history:
+            max_day_len = max(len(entry.split(": ", 1)[0]) for entry in sim.human_history) + 2
+            for entry in sim.human_history:
+                parts = entry.split(": ", 1)
+                day_label = f"{parts[0]}: "
+                print(f"  {day_label:<{max_day_len}}{parts[1]}")
 
     # Top winners
     top_c = sorted(sim.connectors.values(), key=lambda x: x.balance, reverse=True)[0]
     top_n = sorted(sim.nodes.values(), key=lambda x: x.earnings, reverse=True)[0]
     
-    print(f"\nTop Connector: C{top_c.id} (Bal: {top_c.balance:.2f})")
-    print(f"Top Node: N{top_n.id} (Earnings: {top_n.earnings:.2f})")
+    print(f"\nTop Connector: 🕺{top_c.id} (Bal: 🪙{top_c.balance:.2f})")
+    print(f"Top Node: 💃{top_n.id} (Earnings: 🪙{top_n.earnings:.2f})")
 
 if __name__ == "__main__":
     main()

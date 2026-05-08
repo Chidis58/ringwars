@@ -25,6 +25,7 @@ class Simulation:
         self.total_spent = 0 
 
         self.history = []
+        self.human_history = []
         
         # 🔥 Social graph
         self.graph = nx.Graph()
@@ -33,6 +34,12 @@ class Simulation:
 
         for nid in sorted(nodes.keys()):
             self.graph.add_node(f"N{nid}", type="node")
+
+    def _fmt_c(self, cid):
+        return f"🕺{cid}" if cid is not None else "None"
+
+    def _fmt_n(self, nid):
+        return f"💃{nid}" if nid is not None else "None"
 
     def cluster_overlap(self, connector_id, node_id):
         overlap = 0
@@ -72,6 +79,7 @@ class Simulation:
         node.earnings += node_share
 
         # graph update
+        is_revisit = node.id in c.connections
         self.graph.add_edge(f"C{c.id}", f"N{node.id}")
         c.connections.add(node.id)
         node.connections.add(c.id)
@@ -82,15 +90,22 @@ class Simulation:
         else:
             node.visit_load = max(0, node.visit_load - 0.2)
 
+        # Emoji logic
+        symbol = "🔁" if is_revisit else "🤝"
+        c_fmt = self._fmt_c(c.id)
+        n_fmt = self._fmt_n(node.id)
+
         # ring logic
         if cost > node.last_price:
             old_holder = node.ring_holder
             node.ring_holder = c.id
             node.last_price = cost
             node.streak += 1
-            events.append(f"C{c.id} took Ring of N{node.id} from C{old_holder} at {cost:.1f} ({reason})")
+            old_fmt = self._fmt_c(old_holder) if old_holder is not None else "None"
+            events.append(f"{c_fmt} took 💍 of {n_fmt} from {old_fmt} at 🪙{cost:.1f} ({reason})")
         else:
-            events.append(f"C{c.id} connected to N{node.id} at {cost:.1f} ({reason})")
+            type_label = "🔁REVISIT" if is_revisit else "🫂NEW"
+            events.append(f"{c_fmt} {type_label} {n_fmt} at 🪙{cost:.1f} ({reason})")
         return True
 
     def day_step(self, day):
@@ -103,32 +118,66 @@ class Simulation:
             if self.human_player.role == 'connector':
                 human_cid = self.human_player.id
                 me = self.connectors[human_cid]
-                print(f"\n--- DAY {day} ---")
-                print(f"STATUS: Balance: {me.balance:.2f} | Connections: {len(me.connections)}")
+                print(f"\n\n{'='*13} DAY {day}{'='*14}")
+                print(f"🕺{me.id}, You have |🪙{me.balance:.2f} | 🫂{len(me.connections)}")
+                
+                # Pre-calculate node data
+                nodes_state = {}
+                me_connected = {}
+                for nid, n in self.nodes.items():
+                    overlap = self.cluster_overlap(me.id, n.id)
+                    pressure = min(1.0, overlap / 5.0) 
+                    is_revisit = nid in me.connections
+                    me_connected[nid] = is_revisit
+                    
+                    recent = [
+                        f"Day {d['day']}: {self._fmt_c(d['connector_id'])} {d['reason']} @ 🪙{d['cost']:.1f}"
+                        for d in self.obs_logger.all_decisions 
+                        if d['node_id'] == nid
+                    ][-3:]
+
+                    nodes_state[nid] = {
+                        "estimated_cost": compute_cost(me, n, overlap, self.params),
+                        "visit_load": n.visit_load,
+                        "ring_holder": n.ring_holder if n.ring_holder is not None else "None",
+                        "connected_connectors": sorted(list(n.connections)),
+                        "recent_activity": recent,
+                        "cluster_pressure": pressure
+                    }
+
                 state = {
                     "balance": me.balance,
-                    "nodes": {
-                        nid: {
-                            "estimated_cost": compute_cost(me, n, self.cluster_overlap(me.id, n.id), self.params),
-                            "visit_load": n.visit_load,
-                            "ring_holder": n.ring_holder
-                        } for nid, n in self.nodes.items()
-                    }
+                    "my_connections": len(me.connections),
+                    "my_rings": sum(1 for n in self.nodes.values() if n.ring_holder == me.id),
+                    "nodes": nodes_state,
+                    "me_connected_to_target": me_connected
                 }
                 action = self.human_player.choose_action(state)
                 if action['type'] == 'connect':
                     target_node = self.nodes[action['target']]
+                    is_revisit = target_node.id in me.connections
+                    verb = "🔁Revisited" if is_revisit else "🫂connected to"
                     success = self.process_connection(me, target_node, day, "human_choice", events)
                     if success:
-                        human_action_log = f"C{me.id} → N{target_node.id}"
+                        human_action_log = f"you {verb} {self._fmt_n(target_node.id)}"
+                    else:
+                        human_action_log = f"attempted to 🫂connect to {self._fmt_n(target_node.id)} (Failed: Insufficient Balance)"
+                elif action['type'] == 'exit':
+                    print("Exiting simulation...")
+                    self.logger.summary(self.connectors, self.nodes)
+                    import sys
+                    sys.exit(0)
                 else:
-                    human_action_log = "Skip"
+                    human_action_log = "you skip"
+                
+                self.human_history.append(f"Day {day}: {human_action_log}")
             
             elif self.human_player.role == 'node':
                 human_nid = self.human_player.id
                 me = self.nodes[human_nid]
-                print(f"\n--- DAY {day} ---")
-                print(f"STATUS: Earnings: {me.earnings:.2f} | Visit Load: {me.visit_load:.2f} | Ring Holder: {me.ring_holder}")
+                print(f"\n\n{'='*13} DAY {day}{'='*14}")
+                rh_fmt = self._fmt_c(me.ring_holder) if me.ring_holder is not None else "None"
+                print(f"💃{me.id}, You have |🪙{me.earnings:.2f} | 🤱{me.visit_load:.2f} | 💍{rh_fmt}")
                 state = {
                     "earnings": me.earnings,
                     "visit_load": me.visit_load,
@@ -138,9 +187,11 @@ class Simulation:
                 if action['type'] == 'influence':
                     influence_map = {'encourage': 0.8, 'neutral': 1.0, 'discourage': 1.5}
                     me.influence = influence_map[action['mode']]
-                    human_action_log = f"Set influence: {action['mode']}"
+                    human_action_log = f"you set influence: {action['mode']}"
                 else:
-                    human_action_log = "Skip"
+                    human_action_log = "you skip"
+                
+                self.human_history.append(f"Day {day}: {human_action_log}")
 
         # 2. Handle AI Agents
         all_cids = sorted(self.connectors.keys())
@@ -160,16 +211,18 @@ class Simulation:
         if self.human_player:
             print(f"Your action: {human_action_log}")
             print("Top events:")
-            # Show top 5 events
             for e in events[:5]:
                 print(f"  {e}")
             
             snap = self.snapshot()
             print("\nSystem:")
-            print(f"  Avg ⤵️: {snap['avg_visit_load']:.2f}")
-            print(f"  Total supply: {snap['supply']:.1f}")
-            print("-" * 20)
+            print(f"  Avg 🤱: {snap['avg_visit_load']:.2f}")
+            print(f"  Total supply: 🪙{snap['supply']:.1f}")
+            print("-" * 47)
         else:
+            # For experiments/logger, also use emoji-friendly names if possible, 
+            # but we'll stick to text-based logger to avoid breaking existing downstream parsers if any.
+            # However, logger.py's log_day can be updated too.
             self.logger.log_day(day, events)
         
         self.history.append(self.snapshot())
